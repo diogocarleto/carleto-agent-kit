@@ -15,7 +15,7 @@
 #                                   bad, $SRC, $OUT, $ONLY, $OVERLAY and every helper below. An overlay with
 #                                   stacks/ and no verify.d/*.sh still runs (its stacks are checked); one
 #                                   with neither fails.
-#   Arguments combine in any order: ./verify.sh generic --overlay .
+#   Arguments combine in any order: ./verify.sh generic --overlay <repo>
 #
 set -euo pipefail
 SRC="$(cd "$(dirname "$0")" && pwd)"
@@ -42,7 +42,7 @@ if [ -n "$OVERLAY_GIVEN" ]; then
 fi
 export OVERLAY
 # Where stacks live: the kit's own, plus the overlay's when it has any and they are not the same
-# directory (an overlay that is this checkout itself adds nothing, so the two roots coincide).
+# directory (an overlay whose stacks/ is the kit's own adds nothing, so the two roots coincide).
 STACK_ROOTS=("$SRC/stacks")
 if [ -n "$OVERLAY" ] && [ -d "$OVERLAY/stacks" ] \
    && [ "$(cd "$OVERLAY/stacks" && pwd -P)" != "$(cd "$SRC/stacks" && pwd -P)" ]; then
