@@ -1,0 +1,8 @@
+name: generic
+description: Any project — ships the shared agent layer with no framework conventions; the project grows its own.
+layers:
+  - backend
+  - frontend
+context:
+  - architecture.md
+  - build-commands.md

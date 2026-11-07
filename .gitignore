@@ -1,0 +1,53 @@
+# Local scratch used to verify install.sh
+/.scratch-target/
+
+# A contributor's global gitignore may ignore any directory named .claude / .codex / .cursor /
+# .agent-kit / .vscode. This kit SHIPS all five under common/ as the agent layer, so re-include them
+# (negation overrides the global ignore). Without this, `git add` silently skips the entire tree.
+!common/.claude/
+!common/.claude/**
+!common/.codex/
+!common/.codex/**
+!common/.cursor/
+!common/.cursor/**
+!common/.vscode/
+!common/.vscode/**
+!common/.agent-kit/
+!common/.agent-kit/**
+
+# This repo does NOT install the kit into itself (CONTRIBUTING → "Working on the kit"). The only agent
+# files at the root are the two hand-written harness entrypoints below. Re-include both the directory AND
+# the file: without the directory negation the file negation is unreachable.
+!/.claude/
+!/.claude/CLAUDE.md
+!/.codex/
+!/.codex/AGENTS.md
+
+# The kit's own backlog (.agent-kit-local/planning/…) is tracked, but a contributor's global gitignore may
+# list .agent-kit-local too. The installed context/ copy is re-excluded below.
+!/.agent-kit-local/
+!/.agent-kit-local/**
+
+# Guard against an accidental `./install.sh generic .` in this repo: that output is a copy of common/
+# and is never committed. Listed per-child so the two entrypoints above survive.
+/.agent-kit/
+/.claude/skills/
+/.claude/agents/
+/.claude/settings.json
+/.claude/settings.local.json
+/.codex/skills/
+/.codex/agents/
+/.codex/rules/
+/.codex/Makefile
+/.codex/config.toml
+/.codex/sync-codex-config.py
+/.cursor/
+/.github/
+/.vscode/
+/.agent-kit-local/context/
+/.user-kit/
+/.user-kit-local/
+/.synced-from
+
+# Never track OS cruft, even under the re-included dirs above (must stay LAST so it wins).
+.DS_Store

@@ -1,0 +1,22 @@
+{
+  "autoRun": {
+    "allow_instructions": [
+      "Allow Maven build and test commands (mvn ...)",
+      "Allow JShell (jshell ...)",
+      "Allow npm commands (npm ...)",
+      "Allow other mainstream build/test toolchains: pnpm, yarn, go, cargo, uv, pytest, dotnet",
+      "Allow mongosh commands",
+      "Allow running the kit's UI detector: node .agent-kit/ui/detect.mjs ...",
+      "Allow running the kit's plan linter: node .agent-kit/planning/plan-lint.mjs ...",
+      "Allow read-only inspection commands: ls, cat, grep, rg, find, head, tail, wc, sed -n, javap, jar tf, unzip -l, unzip -p, xmllint",
+      "Allow read-only git commands: status, diff, log, show, rev-parse, rev-list, branch, ls-tree, check-ignore, stash list",
+      "Allow git add, git commit, git tag, git mv, and git restore",
+      "Allow docker info, docker version, and docker wait",
+      "Allow peer-harness delegation verbs: codex exec ... and claude -p ... (see /peer-dispatch)"
+    ],
+    "block_instructions": [
+      "Never run in-place file mutations such as sed -i, perl -i, or shell redirection that writes files (use the editor's file-editing tools instead)",
+      "Never run destructive or irreversible commands without explicit user approval, including rm -rf, git push --force, git reset --hard, and git clean"
+    ]
+  }
+}

@@ -1,0 +1,78 @@
+# structure.yml — PROJECT STRUCTURE MANIFEST  (TEMPLATE)
+#
+# Project-local: the real instance lives at .agent-kit-local/structure.yml and is in .agentignore —
+# an agent-kit install never overwrites it. Generated/refreshed by /structure-extract.
+#
+# This is the cheap, machine-readable "index card" the orchestrator and the shared reviewer agents
+# read to ROUTE work without loading full module memory. Rich prose dossiers (flows, gotchas, SPIs)
+# live in modules/_root + modules/<module> and load via /modules. Keep this file FACTUAL and small:
+# if it's derivable in one read, it belongs here; reasoning belongs in module memory.
+#
+# Copy to .agent-kit-local/structure.yml and fill in (or let /structure-extract do it).
+
+project:
+  name: <project-name>
+  summary: <one line — what this project is>
+
+# Primary languages present in the repo.
+languages: [<lang>, <lang>]            # e.g. [java], [java, typescript], [kotlin, swift]
+
+# What each layer is built on — drives which conventions apply. Omit a key if the layer is absent.
+frameworks:
+  # Two of these keys also SELECT A VARIANT, and the value IS the filename suffix:
+  #   frontend → .agent-kit/frontend/framework-<value>.md     (the framework's own standard)
+  #          and conventions/frontend/framework-<value>.md    (this stack's layer, which wins)
+  #   database → .agent-kit/persistence/persistence-<value>.md  (the engine's own standard)
+  #          and conventions/backend/persistence-<value>.md   (this stack's layer, which wins)
+  #                                                           (mysql → persistence-mysql.md)
+  # Nothing maps the two, so match the suffix the stack ships. Omitted → the layer skills read ALL
+  # variants of that family and say so; omit it rather than guess.
+  backend:  <quarkus | spring | …>
+  frontend: <svelte | react | vue | angular | …>
+  mobile:   <react-native | swift | kotlin | …>   # omit entirely if there is no mobile app
+  database: <mongodb | postgres | mysql | oracle | mssqlserver | …>   # omit if there is no database
+
+# Where each layer's code lives + how to build/test it.
+layers:
+  backend:
+    src_globs:  ["**/src/main/java/**"]
+    test_globs: ["**/src/test/java/**"]
+    build:      "mvn"                            # command prefix the test-runner uses
+  frontend:
+    root:       "<path/to/web>"                  # e.g. "<app>/web"
+    src_globs:  ["<path/to/web>/src/**"]
+    file_exts:  [".svelte", ".ts", ".css"]
+    build:      "npm --prefix <path/to/web>"
+
+# Reviewer/skill routing — the shared reviewer agents read THIS instead of hardcoding paths.
+# A change matching only backend_globs → backend reviewer; only frontend_globs or mobile_globs →
+# frontend reviewer (it covers both client surfaces); both a client and backend glob (or a DTO+type
+# change) → fullstack reviewer.
+routing:
+  backend_globs:  ["**/*.java", "**/pom.xml", "**/*.properties"]
+  frontend_globs: ["**/web/**/*.{svelte,ts,css}"]
+  # Only if the project has a mobile layer; the mobile reviewer routing mirrors frontend_globs.
+  mobile_globs:   []   # e.g. ["**/app/**/*.{kt,swift,tsx}"]
+
+# Buildable units in this repo (Maven/Gradle modules, packages, or sub-projects).
+modules: [<module-a>, <module-b>]
+
+# PROVENANCE — for each consumed dependency: where its canonical source/memory lives, and HOW we
+# consume it. consumed_as answers the question an agent cares about: "can I edit this source HERE?"
+#   jar       → binary Maven/Gradle dependency; source is in source_project; NOT editable here.
+#   vendored  → source copied into this repo as local code; editable here.
+#   source    → a local module built from source in this same repo; editable here.
+#   submodule → git submodule; editable, but commits go to the submodule's repo.
+module_sources:
+  <consumed-module>: { source_project: <other-project>, consumed_as: jar }
+  <local-package>:   { consumed_as: vendored }
+
+# Sibling local projects whose patterns/features we can leverage, or that are the source of our modules.
+# Paths are best-effort: repo-root-relative, machine-specific — may not resolve on every checkout.
+related_projects:
+  - name: <project>
+    path: ../<project>
+    role: <framework-source | sibling>   # framework-source = canonical source+memory for consumed modules
+
+# Freshness anchor (mirrors modules/INDEX.md): short SHA this manifest was last fact-checked against.
+verified: <short-sha>

@@ -1,0 +1,17 @@
+carleto-agent-kit
+Copyright (c) 2026 Diogo Carleto
+Licensed under the MIT License (see LICENSE).
+
+Credits
+-------
+
+The UI toolkit (.agent-kit/ui/ in an install; common/.agent-kit/ui/ in this repo) is inspired by
+impeccable (https://github.com/pbakaus/impeccable, by pbakaus, Apache-2.0), which itself started
+from Anthropic's frontend-design skill. Impeccable's platform references in turn draw on
+ehmo/platform-design-skills (https://github.com/ehmo/platform-design-skills, MIT).
+
+This is inspiration only. No code and no text was copied from impeccable, from
+platform-design-skills or from the frontend-design skill. What the toolkit shares with them is
+ideas: its working modes, the brand and product registers, and several themes of the "AI tells" it
+checks for. The wording, the files and the code are this project's own, so none of those projects'
+license notices apply to the files here.

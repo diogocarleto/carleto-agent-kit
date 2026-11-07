@@ -1,0 +1,8 @@
+# Codex CLI settings for this kit-installed project. A SEED (install.sh seed_once): kept once edited,
+# refreshed while untouched, replaced by --reset-defaults — see README.
+#
+# project_doc_max_bytes = 0 stops Codex loading this project's own root AGENTS.md, in a project
+# trusted in ~/.codex/config.toml. The kit's instructions arrive instead via developer_instructions
+# below — a generated block `make -C .codex sync-agents` rewrites every run (.codex/Makefile →
+# sync-codex-config). Untrusted, Codex ignores this whole file and falls back to the root AGENTS.md.
+project_doc_max_bytes = 0
