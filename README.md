@@ -134,9 +134,12 @@ The skills, by what they load:
 finishes, but those files are missing or stale and `code-reviewer.md` is deleted), `python3` (it merges
 `claudeMdExcludes` and the two VS Code keys, and writes Codex's `developer_instructions`; without it the
 first two are printed for you to add by hand, and a trusted Codex project gets no instructions at all) and,
-to get kit-version stamps and seed refreshes, a `git` checkout of this repo. `node` is needed only by
-`./verify.sh`, for its plan-lint check, which is skipped without it; installing never uses it. The target
-must already exist.
+to get kit-version stamps and seed refreshes, a `git` checkout of this repo. Installing never uses `node`;
+`/feature-plan`, `/feature-execute`, `/ui-design` and `/ui-detect` run a script with it, and `./verify.sh`
+skips its plan-lint check without it. The target must already exist.
+
+⚠ **On Windows, run the kit under WSL.** It is `bash` and `make` throughout, which native Windows lacks;
+Git for Windows ships `bash` but neither `make` nor `python3`.
 
 Run `install.sh` from your clone of the kit. A relative target such as `../my-service` is resolved against
 your current directory, so an absolute path works from anywhere:
