@@ -1,0 +1,31 @@
+# Stack metadata — discovered by install.sh (--list / --help) by scanning stacks/*/stack.yml.
+# A stack is a whole-project bundle: one pick installs all of its conventions/<layer>/ dirs.
+# Because skills glob conventions/<layer>/ at invoke, a stack only fills files — it never lists
+# per-doc imports. Add a convention by dropping a .md into the right layer/companion folder.
+name: quarkus
+description: Quarkus 3.40, Java 21 — Quarkus REST, CDI (ArC), Panache repositories, Bean Validation, MapStruct, Maven. Backend only. Persistence ships as a per-database variant (MongoDB, PostgreSQL, SQL Server).
+
+# Convention layers this stack ships (each becomes .agent-kit/common/conventions/<layer>/ on install).
+# Backend only: a stack with no conventions/frontend/ yields none in the consumer, so /frontend reads
+# only the framework-neutral frontend standard that every stack gets. Add the layer here the day a
+# frontend convention doc is written for it.
+layers:
+  - backend
+
+# No companion bundles. This stack ships no messaging layer and no scaffold/DCR recipes, so
+# /messaging and /dcr fall back to their framework-neutral halves and /scaffold has nothing to
+# generate. A companion is warranted once a concern here is ONE of many and worth loading lazily.
+
+# The project-local always-on "context" tier — canonical defaults this stack provides, seeded into the
+# consumer's .agent-kit-local/context/ on first install. A seed the project never edits is refreshed on
+# reinstall; one it edits is kept (the project owns it from then on). These are the local half of
+# Tier 0 (the module map + how to build/test).
+# (CLAUDE.md is kit-standard, not stack-specific — it's seeded from common/.claude/, not here.)
+context:
+  - architecture.md       # → .agent-kit-local/context/architecture.md
+  - build-commands.md     # → .agent-kit-local/context/build-commands.md
+
+# No module memory ships here. Stack-shipped modules exist for a framework EVERY consumer of the
+# stack shares; Quarkus's own extensions are third-party and reachable as source, so any module
+# worth documenting belongs to the project and is written with /module-extract into
+# .agent-kit-local/modules/, which install never touches.
