@@ -8,7 +8,7 @@ You clone this repo and run `./install.sh <stack> <your-project>` from the clone
 flattened copy of the layer, never `stacks/` itself: this repo is a catalog, not a dependency.
 
 ```bash
-git clone <repository-url> carleto-agent-kit   # once
+git clone https://github.com/diogocarleto/carleto-agent-kit   # once
 cd carleto-agent-kit
 ./install.sh --list                  # the stacks below, read live from stacks/*/stack.yml
 ./install.sh <stack> <target>        # install; re-running is safe
