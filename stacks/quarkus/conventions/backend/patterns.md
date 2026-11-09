@@ -2,7 +2,7 @@
 
 - **`@ApplicationScoped` by default** for services, repositories and mappers; `@RequestScoped` only for genuine per-request state; `@Dependent` for a helper that lives and dies with its injection point.
 - ⚠ **`@Singleton` has no client proxy, and `@InjectMock` replaces a bean through its proxy** (`testing.md`). A `@Singleton` is not mockable that way; reach for it only where the proxy costs something you measured.
-- ⚠ **A class with no scope annotation is not a bean**, unless an extension adds one (`@Scheduled` and `@Startup` do). ArC discovers beans at build time, so scope every hand-written one.
+- ⚠ **A class with no scope annotation is not a bean** (a class declaring a `@Produces` method is `@Dependent`), unless an extension adds one (`@Scheduled` and `@Startup` do). ArC discovers beans at build time, so scope every hand-written one.
 - **Constructor injection, never field injection.** `@Inject` is optional on a single constructor. Field injection makes the bean unbuildable with `new`, which is how `testing.md` expects services to be tested.
 - **A `@Produces` method only for what the container cannot discover** — a third-party client, an executor. A producer that returns your own `@ApplicationScoped` service is a second registration of the same thing.
 - **Beans are shared across threads** — fields stateless or effectively immutable (`concurrency.md`).
