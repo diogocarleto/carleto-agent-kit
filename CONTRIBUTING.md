@@ -408,7 +408,7 @@ No skill/agent/Makefile edits — they glob the layer dirs. `CLAUDE.md` is kit-s
 
 ## Generalization seam (known)
 
-The core ships framework stacks (`jakarta-ee`, `spring-boot`) plus `generic` — no conventions at all, for a project that just wants the skills,
+The core ships framework stacks (`jakarta-ee`, `quarkus`, `spring-boot`) plus `generic` — no conventions at all, for a project that just wants the skills,
 agents, and process layer; `./install.sh --list` shows what is installable. `generic` is also the kit's **neutrality test**: anything framework-specific that leaks into a
 shared file shows up there as a wrong instruction, which is why `verify.sh` greps a generic install for
 build-tool instructions (JVM-shaped patterns only — see the caveat in *The loop that makes "overwrite"
@@ -437,7 +437,7 @@ list instead. Both stacks ship `recipes/`, so both invoked the skill and one was
 wrong instruction. It now has the **same two-layer shape as `/messaging`**: neutral invariants in
 `.agent-kit/dcr/` (always read) plus the stack's `recipes/new-dcr.md` (read when present, and it wins).
 ⚠ The neutral half is not optional just because some stacks ship no `recipes/`: the skill is delivered to
-**every** stack, so on one without them (`jakarta-ee`, `spring-boot`, `generic`) the glob finds nothing and `core.md` is the *only* thing
+**every** stack, so on one without them (`jakarta-ee`, `quarkus`, `spring-boot`, `generic`) the glob finds nothing and `core.md` is the *only* thing
 the agent gets — which is exactly where it must say "this stack has no DCR layer, use its real migration
 mechanism, do not invent a shape". A skill that can fire on a stack without the layer needs the neutral
 half most, not least. `/migrate` has that same two-layer shape and was built neutral-first: no stack
@@ -473,9 +473,9 @@ family sitting beside it is precisely why nothing *else* in such a directory may
 
 `/backend` has since taken the same two-layer shape for **persistence**: engine facts live once in
 `.agent-kit/persistence/` (`core.md` + `persistence-<db>.md`), and each stack's `persistence-<db>.md`
-carries only how its API expresses them. ⚠ The JPA-spec rules the `jakarta-ee` and `spring-boot`
+carries only how its API expresses them. ⚠ The JPA-spec rules the `jakarta-ee`, `quarkus` and `spring-boot`
 relational docs share **stay in those stacks on purpose**: they belong to the access-API axis, not the
-engine, and `jakarta-ee` hedges the provider (`RUNTIME GAP`) where `spring-boot` states Hibernate — so
+engine, and `jakarta-ee` hedges the provider (`RUNTIME GAP`) where `quarkus` and `spring-boot` state Hibernate — so
 lifting them into `common/` would ship one provider's behaviour to every stack. `verify.sh` greps the
 neutral dir for persistence-API names (`hibernate`, `panache`, `@Transactional`, `mongock` …) for the same
 reason it greps `messaging/` for framework names.
@@ -487,7 +487,7 @@ that `/backend`, `/fullstack`, `/scaffold` and the backend and fullstack reviewe
 so a further concern is a file drop. Its admission rule is **looser** than the frontend core's, which
 wants the stack docs to *already agree*: here a rule enters where **no stack that speaks to it
 dissents** — silence counts as agreement — so it is only as safe as the search for dissent.
-⚠ Stacks ported from one another are one lineage (`jakarta-ee` and `spring-boot` were ported from
+⚠ Stacks ported from one another are one lineage (`jakarta-ee`, `quarkus` and `spring-boot` were ported from
 a stack that predates them and is not published here): the source stack, the ports and any fork of them count as **one** voice, so their
 agreement is inherited, not independent. The independent check is a stack from outside that lineage —
 e.g. a library stack with no application framework — and a rule it contradicts is its *dissenter*. That
@@ -634,8 +634,8 @@ one hand-written, tracked file (`.claude/CLAUDE.md`, `.codex/AGENTS.md`) and not
 - **A fact true of two stacks must appear in both stack docs.** Where two stacks wrap forks of the same
   upstream module, or document one engine through two APIs, a rule stated in one doc and missing from the
   other is the defect this kit produces most — ten review rounds of one companion found one or two per pass
-  by reading. The core's own such pair is the `jakarta-ee` / `spring-boot` relational
-  `persistence-{postgres,mssqlserver}.md` twins.
+  by reading. The core's own such pairs are the relational `persistence-{postgres,mssqlserver}.md` twins of
+  `jakarta-ee`, `quarkus` and `spring-boot`, one pair per stack.
   A coverage check in a `verify.d/` hook (an overlay's: [docs/private-overlay.md](docs/private-overlay.md)) can
   make it mechanical for **a pair**: each doc must match a pattern for every load-bearing topic.
   ⚠ Be honest about its strength — it asserts a *phrase is present*, not that the doc

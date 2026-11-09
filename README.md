@@ -61,6 +61,7 @@ exactly one stack, so every project is shaped the same and only the convention *
 |-------|-----|
 | **`generic`** | Any project: the shared layer with **no** framework conventions. Your project grows its own stack from here: to contribute it to the kit, see [Adding a stack](CONTRIBUTING.md#adding-a-stack); to keep it in a repo of your own, see [docs/private-overlay.md](docs/private-overlay.md). |
 | **`jakarta-ee`** | Plain Jakarta EE 11, Java 21: JAX-RS, CDI, Bean Validation, Jakarta Concurrency, MapStruct, Maven. Persistence is a per-database variant (MongoDB, PostgreSQL, SQL Server). Backend conventions only. The runtime (WildFly, Open Liberty, Payara, TomEE) is undecided, and the docs say so inline: grep `RUNTIME GAP`. |
+| **`quarkus`** | Quarkus 3.40, Java 21: Quarkus REST, CDI (ArC), Panache repositories, Bean Validation, MapStruct, Maven. Persistence is a per-database variant (MongoDB, PostgreSQL, SQL Server). Backend conventions only. |
 | **`spring-boot`** | Spring Boot 4 on Spring Framework 7, Java 21: Spring MVC, Spring Data, Spring Security, Bean Validation, MapStruct, Maven. Persistence is a per-database variant (PostgreSQL, SQL Server, MongoDB). Backend conventions only. |
 
 Skills never name a convention file. They **glob** a directory and read what is in it, which is why a stack
@@ -123,7 +124,7 @@ The skills, by what they load:
 | `/backend` `/frontend` `/fullstack` | the layer's neutral standard, then the stack's conventions for it |
 | `/mobile` | the stack's mobile conventions, when it ships them |
 | `/messaging` `/dcr` `/migrate` | neutral invariants always, plus the stack's companion docs when it ships them |
-| `/scaffold` | the stack's recipes, so it has nothing to generate on a stack without them. None of the three stacks above ships any |
+| `/scaffold` | the stack's recipes, so it has nothing to generate on a stack without them. None of the four stacks above ships any |
 | `/feature-plan` `/feature-execute` `/brainstorm` `/peer-dispatch` | the process docs |
 | `/modules` `/module-extract` `/structure-extract` | project memory and the structure manifest |
 | `/ui-design` `/ui-extract` `/ui-detect` | the UI toolkit |
@@ -264,7 +265,7 @@ Four seeds are special:
 - **`.agent-kit-local/modules/<name>/`.** A stack that ships module memory seeds exactly the names its
   `stack.yml` declares, never the directory: your own module memory and `modules/INDEX.md` sit beside
   them. A stack switch leaves the old stack's module dirs in place: nothing reads them once they are
-  undeclared, and removing them is your call. None of the three stacks above ships any.
+  undeclared, and removing them is your call. None of the four stacks above ships any.
 
 ### What each install touches
 
