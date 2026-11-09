@@ -50,7 +50,8 @@ Every enum carries the `Enum` suffix: `InvoiceStatusEnum`, `PaymentMethodEnum` �
 
 Every enum appearing in a Request or Response DTO **must** have:
 1. `public final String value` — lowercase snake_case, stored in the database and sent over the wire.
-2. `static fromValue(String value)` — case-insensitive lookup, throwing the project's validation exception (`api.md`) on no match.
+2. `static fromValue(String value)` — case-insensitive lookup, throwing a domain exception with a 400 code (`api.md` → Errors) on no match.
+3. A `public static final String <NAME>_VALUE` constant per wire value (`api.md`, for `@Schema` allowable values).
 
 Enums used for UI display may add `public final String displayName`. **Internal-only enums** (never in a DTO) may throw `IllegalArgumentException` from `fromValue` instead.
 
