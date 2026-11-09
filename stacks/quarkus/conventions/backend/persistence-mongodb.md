@@ -21,7 +21,7 @@ One `@ApplicationScoped` repository per aggregate, implementing `PanacheMongoRep
 - ⚠ **A derived getter is persisted.** `getFullName()` with no backing field becomes a stored key. Annotate it `@BsonIgnore`: the opposite of a field-based mapper.
 - ⚠ **A stored key the class does not map is skipped on read and erased by the next `update()`** (*Writes*): a removed or renamed field, or one another writer added. A `@BsonExtraElements` property keeps them.
 - **A null property is omitted from the document**, not written as `null`.
-- The id is the property named `id` (or `_id`); anything else needs `@BsonId`. Enums are stored by `name()`; `Instant` as a BSON date, in milliseconds.
+- The id is the property named `id` (or `_id`); anything else needs `@BsonId`. Enums are stored by `name()` (the wire `value` is an API concern only), so renaming a constant is a data migration; `Instant` as a BSON date, in milliseconds. Keys are the Java property names, case-sensitive; the relational snake_case rule does not apply here.
 - ⚠ **A `UUID` fails to encode until the representation is set**, by `quarkus.mongodb.uuid-representation` or `uuidRepresentation=` in the connection string. A new application takes `STANDARD`; one with data already written takes the representation that wrote it.
 - **Records** serve as embedded value objects and aggregation results; a record component is its own key, so `@BsonId` marks `_id`.
 
@@ -66,7 +66,7 @@ Two shapes are safe:
 
 ⚠ **Neither Panache nor the codec has a version annotation.** `jakarta.persistence.Version` is ignored, and a field named `version` is ordinary data that `update()` overwrites with whatever it holds: a last-write-wins replace that loses the other writer's change with no error.
 
-The shape is a hand-written `long version` on the aggregate root, set to 0 by the factory that creates it (`patterns.md` → *Entity Defaults and Partial Updates*), and a conditional update that filters on the version that was read:
+The shape is a hand-written `Long version` on the aggregate root, set to 0 by the factory that creates it (`patterns.md` → *Entity Defaults and Partial Updates*), and a conditional update that filters on the version that was read:
 
 ```java
 long won = update(Updates.combine(Updates.set("status", status), Updates.inc("version", 1)))

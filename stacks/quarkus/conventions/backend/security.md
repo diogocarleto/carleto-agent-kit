@@ -15,16 +15,16 @@ This stack prescribes **authorization**: who may call what, enforced by annotati
 
 `@RolesAllowed` goes on the **resource method** and again on the **service method** the resource calls. A service is reachable without a resource — from another bean, a scheduler, a startup hook — and the resource check does not follow it there.
 
-- **Annotate the method another bean calls.** Interception runs through the container's generated subclass, so a `private` method is never checked. The build fails on one by default (`quarkus.arc.fail-on-intercepted-private-method`); set false, it only logs a warning and the annotation is ignored.
-- **An anonymous caller is rejected 401, an authenticated one without the role 403.** `"**"` as a role means any authenticated user. Pick one role vocabulary for the codebase.
-- ⚠ **A scheduler or startup hook has no caller identity unless the project supplies one**, so a guarded service rejects it as anonymous. Give that path a service method that is deliberately unguarded and not reachable from a resource, rather than weakening the guard.
+- **Annotate the method another bean calls.** Interception runs through the container's generated subclass, so a `private` method is never checked. (`patterns.md` → *Interceptors*).
+- **An anonymous caller is rejected 401, an authenticated one without the role 403 (a problem body; the 401 is bodiless, `api.md`).** `"**"` as a role means any authenticated user. Pick one role vocabulary for the codebase.
+- ⚠ **A scheduler or startup hook has no caller identity unless the project supplies one**, so a guarded service rejects it as anonymous. Give that path a service method annotated `@PermitAll` and not reachable from a resource, rather than weakening the guard.
 
 ### Handling secrets and input
 
 - **Validate at the resource only**, through the validation groups (`api.md`). Services assume an already-validated caller; authorization is the service's own, above.
 - **A credential is write-only** — accepted on a Request, never echoed on a Response, never a field on a model that a mapper can reach.
 - **Never expose** a stack trace or an internal class name in an HTTP body. A 500 returns a problem body with a correlation id and nothing else (`api.md`).
-- **Never hardcode a secret.** Bind deployment config once through a `@ConfigMapping` interface (`code-style.md`); never read the environment at a call site.
+- **Never hardcode a secret.** Bind deployment config once through a `@ConfigMapping` interface (`patterns.md` → *Configuration*); never read the environment at a call site.
 - **Never log** a password, token, session id, API key or PII, at any level (`.agent-kit/backend/logging.md`).
 - **Passwords go through an adaptive hash** (BCrypt or Argon2), never MD5 or SHA-1. Never roll custom crypto.
 

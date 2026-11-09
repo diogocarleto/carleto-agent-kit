@@ -4,7 +4,7 @@ Base path `/api` through `quarkus.rest.path=/api`; resources sit at `/api/v1/{en
 
 ⚠ **Declare the base path once.** An `@ApplicationPath` on any `Application` class wins over `quarkus.rest.path` without a warning, so a second declaration leaves one of them dead.
 
-**Quarkus REST, imperative.** A resource returns a value, never a `Uni`/`Multi` (`concurrency.md`), injects services and mappers only, holds no business rule, and never `try/catch`es to shape a response (`architecture.md`). `@RunOnVirtualThread` goes on the class (`concurrency.md`). ⚠ A `@Path` class is a `@Singleton` by default: no request state in a field.
+**Quarkus REST, imperative.** A resource returns a value, never a `Uni`/`Multi` (`concurrency.md`), injects services and mappers only, holds no business rule, and never `try/catch`es to shape a response (`architecture.md`). `@RunOnVirtualThread` goes on a class whose endpoints block on I/O (the database, a REST client), which is most of them here; a class that only computes stays on the worker pool (`concurrency.md`). ⚠ A `@Path` class is a `@Singleton` by default: no request state in a field.
 
 Return the DTO type directly and let Quarkus send 200. Where the status or headers vary (201 with `Location`) return `RestResponse<T>`, not `Response`: the OpenAPI scanner reads `T` from the former, while the latter hides the body type from the document and from generated clients.
 
@@ -57,8 +57,9 @@ How Quarkus picks a mapper decides what you must write:
 - ⚠ **Two framework bodies need a mapper of your own, or clients see a second format.** Validation: map `ConstraintViolationException` — a `ResteasyReactiveViolationException` with violations on parameters is a 400, anything else a 500. A *mistyped* JSON body (a string where a number goes): map `MismatchedInputException`; Quarkus answers 400 with an **empty** body outside dev and test. A *malformed* one arrives as a bodiless `WebApplicationException` 400, which the catch-all must answer as a 400 problem.
 - ⚠ **A mapped exception is not logged by Quarkus.** Only an unmapped one is, and an unmapped `WebApplicationException` only at DEBUG. The mapper logs the unexpected ones, once (`logging.md`); a mapper for expected 4xx stays quiet.
 - A 500 body carries a correlation id and nothing else — never a stack trace, an exception class name, or a message assembled from one.
-- **401 and 403 stay Quarkus's.** They carry no problem body, and the 401 mapper builds the authentication challenge, so replacing it drops the challenge headers.
-- ⚠ **An exception from a REST client call reaches your mappers too** (`patterns.md` → REST client). Do not let a catch-all copy its status; tell it apart by `ResteasyReactiveClientProblem`.
+- **Every 403 is the same problem body.** Map `io.quarkus.security.ForbiddenException` (a role denial) with your own `ExceptionMapper`, so it matches the ownership-denial 403 a service raises as a domain exception. Your mapper at the default priority beats Quarkus's built-in one.
+- **401 stays Quarkus's**, bodiless, with its challenge. Never map `UnauthorizedException` or `AuthenticationFailedException`: replacing that mapper drops the challenge headers.
+- ⚠ **An exception from a REST client call reaches your mappers too** (`patterns.md` → *REST Client*). Do not let a catch-all copy its status; tell it apart by `ResteasyReactiveClientProblem`.
 
 ### Documenting the API
 
@@ -69,13 +70,13 @@ Every endpoint carries `@Operation` and an `@APIResponse` per status, the errors
 ⚠ **An enum-backed field documents its own allowed values or nothing does.** DTO fields are `String` here (`code-style.md`), so the schema has no enum type to read from and a generated client gets free text. Build the description by concatenating the enum's wire-value constants so it cannot drift:
 
 ```java
-public record InvoiceResponse(
-        @Schema(description = "invoice status — allowed values: " + InvoiceStatusEnum.DRAFT_VALUE + ", " + InvoiceStatusEnum.PAID_VALUE,
-                example = InvoiceStatusEnum.PAID_VALUE)
+public record OrderResponse(
+        @Schema(description = "order status — allowed values: " + OrderStatusEnum.PLACED_VALUE + ", " + OrderStatusEnum.SHIPPED_VALUE,
+                example = OrderStatusEnum.SHIPPED_VALUE)
         String status) {
 }
 ```
 
 - Concatenation is also the only form that compiles: an annotation attribute must be a compile-time constant, and `.formatted(...)` is not one. A description spanning more than one line is built into a `static final String` in the record.
-- Each wire value is a `public static final String` constant on the enum, which its constructor takes by **qualified** name — `DRAFT(InvoiceStatusEnum.DRAFT_VALUE)`. The simple name is an illegal forward reference.
+- Each wire value is a `public static final String` constant on the enum, which its constructor takes by **qualified** name — `PLACED(OrderStatusEnum.PLACED_VALUE)`. The simple name is an illegal forward reference.
 - ⚠ **A `List<T>` field with `@Schema(implementation = T.class)` needs `type = SchemaType.ARRAY`.** Once `implementation` is set, the scanner takes it as the field's type and never reads the collection, so the field is documented as one `T`. Without `implementation`, it reads the array from the generic type.

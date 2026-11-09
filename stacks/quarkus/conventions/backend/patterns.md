@@ -17,7 +17,7 @@ A normal-scoped bean (`@ApplicationScoped`, `@RequestScoped`) is injected as a p
 
 ### Interceptors
 
-`@Transactional`, `@Retry` and `@RolesAllowed` run through the container's generated subclass: they fire on a **non-private method of a bean**, self-calls included. What follows from that, and the order the interceptors run in, is in `architecture.md` and `concurrency.md`.
+`@Transactional`, `@Retry` and `@RolesAllowed` run through the container's generated subclass: they fire on a **non-private method of a bean**, self-calls included. `@Transactional`, `@Retry` or `@RolesAllowed` on a `private` method fails the build by default (`quarkus.arc.fail-on-intercepted-private-method`); set false, the annotation is only logged and ignored. The order the interceptors run in is in `concurrency.md`.
 
 ## Transactions
 
@@ -47,7 +47,7 @@ MapStruct with `componentModel = "jakarta-cdi"`: the generated impl is an `@Appl
 
 - **One mapper per type**, including nested VOs and records. Compose with `uses`; never add a private mapping method for a nested type inside its parent's mapper.
 - **A mapper does not query.** It transforms what it is given; data the source does not carry is resolved by the service and passed in. A mapper that injects a repository turns every `toResponse` into an unbounded read.
-- **Full and partial updates are two methods.** The full one overwrites absent fields with null; the partial one leaves them untouched. The resource picks (`code-style.md` → HTTP verbs).
+- **Full and partial updates are two methods.** The full one overwrites absent fields with null; the partial one leaves them untouched. The resource picks (`code-style.md` → *Code Conventions*).
 - **No business rules in a mapper** — no defaulting, no validation, no conditional derivation beyond format conversion.
 
 ## Serialization Boundaries
@@ -67,7 +67,7 @@ Each type binds to exactly one serializer. Mixing the annotation sets is silent:
 
 ## Entity Defaults and Partial Updates
 
-A defaulted field (`status = DRAFT`) gets its default in **exactly one place: the factory that creates a new entity**. Never in the constructor the persistence binding calls on read — it would rewrite a stored null into the default on every load — and never on a partial-update path, where a request that omits the field would clobber the stored value with the default.
+A defaulted field (`status = PLACED`) gets its default in **exactly one place: the factory that creates a new entity**. Never in the constructor the persistence binding calls on read — it would rewrite a stored null into the default on every load — and never on a partial-update path, where a request that omits the field would clobber the stored value with the default.
 
 Cover all three branches in tests: create applies the default; a partial update omitting the field preserves what is stored; an explicit null means *clear*, if the domain allows clearing at all.
 
@@ -77,11 +77,11 @@ An embedded value object is **not** an entity: no identity, no lifecycle of its 
 
 ## Validation and Exceptions
 
-- **Bean Validation at the resource boundary** (`api.md` → validation groups). Services validate business rules, not field shapes.
+- **Bean Validation at the resource boundary** (`api.md` → *Validation at the boundary*). Services validate business rules, not field shapes.
 - **Services throw a domain exception; an `ExceptionMapper` turns it into the one error body** (`api.md`). No `try/catch` in a resource, and no HTTP concern in a service.
 - **Group violations, then flush.** Accumulate every problem found in one operation and throw once, so the caller gets the whole list instead of the first failure and a round-trip per field.
 - **One code table, one status mapping.** Each domain owns an enum of codes, stable and machine-readable; one place maps code → HTTP status. Never derive the status at the throw site.
-- **Cross-cutting failures reuse the shared code** — access denied, malformed payload and the like are not per-domain codes.
+- **Cross-cutting failures reuse the shared code** — access denied, malformed payload and the like are not per-domain codes. Access denied is the same 403 problem a role denial gets from the `ForbiddenException` mapper (`api.md`).
 
 ## Failure-Path Cleanup Must Not Mask the Original Error
 

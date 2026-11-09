@@ -58,4 +58,4 @@ mvn verify -Pintegration-tests -Dit.test=OrderIntegrationTests
 mvn clean verify -Pintegration-tests -pl <module> -am
 ```
 
-The integration tiers need Docker: **Dev Services** (on by default, `quarkus.devservices.enabled`) starts the database container in dev and test mode, but only for a datasource whose connection is not configured — set a URL and no container starts (`testing.md`). With no container runtime, a JDBC datasource fails the `@QuarkusTest` at boot (dev mode only warns); MongoDB only warns, in tests too, and connects to `127.0.0.1:27017` instead (`testing.md`).
+The integration tiers need Docker; Dev Services and its failure modes: `testing.md`.

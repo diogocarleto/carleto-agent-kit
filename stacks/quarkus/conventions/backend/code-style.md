@@ -8,9 +8,9 @@ Apply the suffix that matches the type's role. The core's roles (`Request`, `Res
 
 | Suffix | Role | Examples |
 |--------|------|---------|
-| *(none)* | Domain entity | `Customer`, `Order`, `Invoice` |
+| *(none)* | Domain entity | `Customer`, `Order`, `Shipment` |
 | `PageResponse` | Paginated outbound DTO | `CustomerPageResponse` |
-| `Enum` | Any enum | `InvoiceStatusEnum`, `PaymentMethodEnum` |
+| `Enum` | Any enum | `OrderStatusEnum`, `PaymentMethodEnum` |
 | `Config` | `@ConfigMapping` interface — externalized values, limits, tuning | `UploadLimitsConfig` |
 | `Aggregation` | Aggregate query output | `GlobalStatsAggregation` |
 | `Stats` | Also aggregated state, beyond the core's counters snapshot | `GlobalStats` |
@@ -44,12 +44,12 @@ Apply the suffix that matches the type's role. The core's roles (`Request`, `Res
 
 ### Enum Naming (Required for all enums)
 
-Every enum carries the `Enum` suffix: `InvoiceStatusEnum`, `PaymentMethodEnum` ✓ — `InvoiceStatus`, `PaymentMethod` ✗. **Variables and parameters never carry it**: `invoiceStatus`, not `invoiceStatusEnum`.
+Every enum carries the `Enum` suffix: `OrderStatusEnum`, `PaymentMethodEnum` ✓ — `OrderStatus`, `PaymentMethod` ✗. **Variables and parameters never carry it**: `orderStatus`, not `orderStatusEnum`.
 
 ### Enum Convention (Required for all API-facing enums)
 
 Every enum appearing in a Request or Response DTO **must** have:
-1. `public final String value` — lowercase snake_case, stored in the database and sent over the wire.
+1. `public final String value` — lowercase snake_case, sent over the wire; the database holds the constant's `name()` (`persistence-<db>.md`).
 2. `static fromValue(String value)` — case-insensitive lookup, throwing a domain exception with a 400 code (`api.md` → Errors) on no match.
 3. A `public static final String <NAME>_VALUE` constant per wire value (`api.md`, for `@Schema` allowable values).
 
@@ -61,7 +61,7 @@ Enums used for UI display may add `public final String displayName`. **Internal-
 
 Request/Response DTOs **must never** declare enum-typed fields, and neither may `@QueryParam`, `@PathParam` or `@HeaderParam` parameters. They enter as `String`; the resource converts with `fromValue(...)` before calling the service. Services receive typed models only.
 
-This keeps the HTTP contract aligned with the enum's `value` (`paid`, `draft`) instead of its constant name (`PAID`, `DRAFT`) — and keeps a malformed value a 400 you shaped, with your message, rather than a type-conversion failure the framework shaped.
+This keeps the HTTP contract aligned with the enum's `value` (`shipped`, `placed`) instead of its constant name (`SHIPPED`, `PLACED`) — and keeps a malformed value a 400 you shaped, with your message, rather than a type-conversion failure the framework shaped.
 
 ### Annotation Conventions
 

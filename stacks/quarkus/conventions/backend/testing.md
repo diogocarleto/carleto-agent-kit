@@ -32,10 +32,10 @@ A service whose collaborators arrive through its constructor (`patterns.md`) is 
 
 | Prefix | Usage | Example |
 |--------|-------|---------|
-| `verify*` | Assertion tests | `verifyInvoiceTotalEquals120` |
+| `verify*` | Assertion tests | `verifyOrderTotalEquals120` |
 | `check*` | Validation tests | `checkInvalidAccessToken` |
 | `execute*` | Action/behaviour tests | `executeAnonymousRequest` |
-| `find*` | Search/lookup tests | `findOpenInvoicesByCustomer` |
+| `find*` | Search/lookup tests | `findOpenOrdersByCustomer` |
 | `exceed*` | Boundary/limit tests | `exceedRateLimitWithOneClient` |
 | `save*` | Persistence tests | `saveDuplicateReference` |
 | `update*` | Modification tests | `updateNonExisting` |
@@ -122,7 +122,7 @@ public class UploadLimitsConfigProducer {
 RestAssured is pointed at the test application's host, port and `quarkus.http.root-path` before every test.
 
 - ⚠ **It is not pointed at `quarkus.rest.path`.** With the base path `/api` (`api.md`), `get("/v1/orders")` goes to a URL that does not exist and answers **404**, so a "404 for an unknown id" test passes without reaching the resource. Put `@TestHTTPEndpoint(OrderResource.class)` on the class: the base becomes `quarkus.rest.path` plus the resource's `@Path`, and paths in the test are relative to the resource. An `@ApplicationPath` is not read; `api.md` declares the base path once for this reason.
-- Assert the **status**, then the error body as `application/problem+json` (`api.md`), not `application/json`.
+- Assert the **status**, then the error body as `application/problem+json` (`api.md`), not `application/json` — except 401, which carries no body (`api.md` → *Errors*).
 - **404, never 204.** A resource method returning `null` makes the resource answer 204 (`api.md`); a test that never checks the status of the miss does not see it.
 - **A misspelt request field is dropped, not rejected** (`patterns.md`): send the body, then assert its effect.
 - **401 and 403 per endpoint** (`security.md`): the policy is the annotations plus two switches no single file shows, and only these tests exercise it.
@@ -161,7 +161,7 @@ Floors, not ceilings: skip a bullet only where the behaviour does not apply.
 - **200/201** with the expected body (201 only where the endpoint deliberately creates).
 - **400** with the right validation code.
 - **401** anonymous.
-- **403** where a role or ownership restriction exists.
+- **403** where a role or ownership restriction exists, as `application/problem+json` for both a role and an ownership denial.
 - **404** for an unknown id: never 204.
 - Pagination where the endpoint is paged.
 

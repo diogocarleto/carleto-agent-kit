@@ -26,7 +26,7 @@ Cross-domain data access goes through the other domain's **service**, never its 
 ### Cross-cutting
 
 - **Entities are plain classes; a repository is a separate bean** (the repository pattern). One repository per aggregate, injected into the service that owns it.
-- ⚠ **Interceptors run through the container's generated subclass, so only a non-private method is intercepted.** `@Transactional`, `@Retry`, `@RolesAllowed` on a `private` method fail the build by default (`quarkus.arc.fail-on-intercepted-private-method`); set it false and the annotation is only logged and ignored (`patterns.md`).
+- ⚠ **Interceptors run through the container's generated subclass, so only a non-private method is intercepted.** `@Transactional`, `@Retry`, `@RolesAllowed` on a `private` method fail the build by default (`patterns.md` → *Interceptors*).
 - **Authorization is annotations on resources and services, denied by default.** Authentication is the project's own choice (`security.md`).
 - **Errors leave through one `ExceptionMapper` and one body shape** (`api.md`).
 - **Blocking code on virtual threads** — imperative services and repositories; no reactive types (`concurrency.md`).
